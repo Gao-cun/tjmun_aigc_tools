@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Maya Chen",
+    "country": "Canada",
+    "committee": "UNHRC",
+    "notes": "Demo delegate profile for writing consistency analysis.",
+    "documents": [
+      {
+        "filename": "maya_position_paper.txt",
+        "documentType": "Position Paper",
+        "meeting": "TJMUN Spring"
+      },
+      {
+        "filename": "maya_directive.txt",
+        "documentType": "Directive",
+        "meeting": "TJMUN Spring"
+      },
+      {
+        "filename": "maya_speech.txt",
+        "documentType": "Speech",
+        "meeting": "Regional Practice"
+      }
+    ]
+  }
+]
+

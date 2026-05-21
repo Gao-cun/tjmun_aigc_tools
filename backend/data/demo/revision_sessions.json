@@ -1,0 +1,12 @@
+[
+  {
+    "source_type": "typing_session",
+    "events": [
+      {"timestamp": 0, "type": "insert", "text": "Honorable chair,"},
+      {"timestamp": 45, "type": "insert", "text": " Canada supports a practical framework."},
+      {"timestamp": 420, "type": "paste", "text": "Digital access should be connected to education, healthcare, and transparent public reporting."},
+      {"timestamp": 460, "type": "delete", "chars": 24}
+    ]
+  }
+]
+
