@@ -68,6 +68,12 @@ OPENAI_API_KEY=your_key_from_env
 
 不要把密钥写入代码或提交到 Git。
 
+macOS 一键脚本默认使用 `EMBEDDING_PROVIDER=hash` 启动 demo，避免首次运行下载 HuggingFace 模型导致界面卡住。需要真实本地 MiniLM embedding 时，用下面命令启动：
+
+```bash
+EMBEDDING_PROVIDER=local ./start-mac.command
+```
+
 ## Demo 数据
 
 首次打开前端时会自动调用 `/demo/seed`。也可以手动执行：
@@ -143,4 +149,3 @@ pytest
 cd frontend
 npm run lint
 ```
-

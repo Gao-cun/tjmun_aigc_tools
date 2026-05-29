@@ -65,7 +65,8 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
 
 def get_embedding_provider(settings: Settings | None = None) -> EmbeddingProvider:
     settings = settings or get_settings()
+    if settings.embedding_provider.lower() == "hash":
+        return HashEmbeddingProvider()
     if settings.embedding_provider.lower() == "openai":
         return OpenAIEmbeddingProvider(settings)
     return SentenceTransformerProvider(settings.local_embedding_model)
-

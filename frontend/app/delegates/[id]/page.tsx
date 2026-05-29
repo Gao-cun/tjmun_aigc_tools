@@ -1,6 +1,6 @@
 import { DashboardShell } from "@/components/dashboard-shell";
 
-export default function DelegatePage({ params }: { params: { id: string } }) {
-  return <DashboardShell initialDelegateId={params.id} />;
+export default async function DelegatePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <DashboardShell initialDelegateId={id} />;
 }
-

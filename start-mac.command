@@ -89,7 +89,8 @@ fi
 info "启动 FastAPI 后端..."
 cd "$BACKEND_DIR"
 source .venv/bin/activate
-python -m uvicorn app.main:app --host 127.0.0.1 --port "$API_PORT" > "$LOG_DIR/backend.log" 2>&1 &
+# 一键 demo 默认使用轻量 hash embedding，避免首次启动/分析下载 HuggingFace 模型卡住。
+EMBEDDING_PROVIDER="${EMBEDDING_PROVIDER:-hash}" python -m uvicorn app.main:app --host 127.0.0.1 --port "$API_PORT" > "$LOG_DIR/backend.log" 2>&1 &
 BACKEND_PID=$!
 
 wait_for_url "$API_URL/health" "后端" || fail "后端启动超时。请查看日志：$LOG_DIR/backend.log"
@@ -127,4 +128,3 @@ EOF
 while true; do
   sleep 3600
 done
-

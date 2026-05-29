@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.models.delegate import DelegateProfile
 from app.models.document import DocumentFeatureSet, WritingDocument
-from app.services.embedding_providers import get_embedding_provider
+from app.services.embedding_providers import HashEmbeddingProvider
 from app.services.stylometry import extract_stylometry
 
 
@@ -20,7 +20,8 @@ def seed_demo_data(db: Session) -> dict:
     if not delegates_path.exists():
         return {"createdDelegates": 0, "createdDocuments": 0}
 
-    provider = get_embedding_provider()
+    # demo 数据用于启动体验，使用确定性轻量向量，避免首次运行下载 HuggingFace 模型导致卡住。
+    provider = HashEmbeddingProvider()
     created_delegates = 0
     created_documents = 0
     for item in json.loads(delegates_path.read_text(encoding="utf-8")):
@@ -51,4 +52,3 @@ def seed_demo_data(db: Session) -> dict:
             created_documents += 1
     db.commit()
     return {"createdDelegates": created_delegates, "createdDocuments": created_documents}
-
