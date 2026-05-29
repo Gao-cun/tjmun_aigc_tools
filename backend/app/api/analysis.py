@@ -17,6 +17,10 @@ router = APIRouter(tags=["analysis"])
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_new_document(
     delegate_id: str = Form(...),
+    embedding_provider: str | None = Form(None),
+    local_embedding_model: str | None = Form(None),
+    openai_embedding_model: str | None = Form(None),
+    openai_api_key: str | None = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
@@ -38,10 +42,20 @@ async def analyze_new_document(
     try:
         text = parse_uploaded_file(file.filename or "analysis.txt", contents)
         features = extract_stylometry(text)
-        embedding = get_embedding_provider().embed_texts([text])[0].tolist()
+        embedding = get_embedding_provider(
+            overrides={
+                "embedding_provider": embedding_provider,
+                "local_embedding_model": local_embedding_model,
+                "openai_embedding_model": openai_embedding_model,
+                "openai_api_key": openai_api_key,
+            }
+        ).embed_texts([text])[0].tolist()
+        history_embeddings = [doc.feature_set.embedding for doc in history_docs]
+        if any(len(item) != len(embedding) for item in history_embeddings):
+            raise ValueError("The selected embedding settings produce a different vector dimension than the history baseline. Please analyze with the same provider/model used for history uploads.")
         result = analyze_consistency(
             [doc.feature_set.features for doc in history_docs],
-            [doc.feature_set.embedding for doc in history_docs],
+            history_embeddings,
             features,
             embedding,
         )
@@ -61,4 +75,3 @@ async def analyze_new_document(
     db.refresh(run)
 
     return AnalyzeResponse(analysis_id=run.id, delegate_id=delegate_id, filename=run.filename, risk_level=result["riskLevel"], result=result)
-

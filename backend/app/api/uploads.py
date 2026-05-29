@@ -16,7 +16,7 @@ from app.services.stylometry import extract_stylometry
 router = APIRouter(tags=["uploads"])
 
 
-def _process_history_document(document_id: str) -> None:
+def _process_history_document(document_id: str, embedding_options: dict | None = None) -> None:
     """后台解析历史文件并写入特征；异常落入文档状态，便于前端显示。"""
     db = SessionLocal()
     try:
@@ -27,7 +27,7 @@ def _process_history_document(document_id: str) -> None:
         if not text:
             raise ValueError("Uploaded document contains no extractable text.")
         features = extract_stylometry(text)
-        embedding = get_embedding_provider().embed_texts([text])[0].tolist()
+        embedding = get_embedding_provider(overrides=embedding_options).embed_texts([text])[0].tolist()
         document.raw_text = text
         document.status = "ready"
         document.error_message = None
@@ -49,6 +49,10 @@ async def upload_history(
     document_type: str = Form("Position Paper"),
     meeting: str | None = Form(None),
     document_date: date | None = Form(None),
+    embedding_provider: str | None = Form(None),
+    local_embedding_model: str | None = Form(None),
+    openai_embedding_model: str | None = Form(None),
+    openai_api_key: str | None = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
@@ -76,6 +80,11 @@ async def upload_history(
     document.file_path = str(stored_path)
     db.commit()
 
-    background_tasks.add_task(_process_history_document, document.id)
+    embedding_options = {
+        "embedding_provider": embedding_provider,
+        "local_embedding_model": local_embedding_model,
+        "openai_embedding_model": openai_embedding_model,
+        "openai_api_key": openai_api_key,
+    }
+    background_tasks.add_task(_process_history_document, document.id, embedding_options)
     return UploadHistoryResponse(document_id=document.id, status="processing", message="History document accepted for background processing.")
-

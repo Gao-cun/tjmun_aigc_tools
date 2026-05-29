@@ -13,7 +13,7 @@ export function DriftChart({ result }: { result?: AnalysisResult | null }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Feature Drift</CardTitle>
+        <CardTitle>特征漂移</CardTitle>
       </CardHeader>
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
@@ -29,4 +29,3 @@ export function DriftChart({ result }: { result?: AnalysisResult | null }) {
     </Card>
   );
 }
-

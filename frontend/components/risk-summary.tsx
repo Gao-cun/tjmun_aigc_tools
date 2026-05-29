@@ -11,14 +11,15 @@ export function RiskSummary({ result }: { result?: AnalysisResult | null }) {
   const level = result?.riskLevel ?? "No analysis yet";
   const isHigh = level.startsWith("High");
   const isMedium = level.startsWith("Medium");
+  const displayLevel = !result ? "尚未分析" : isHigh ? "高一致性风险" : isMedium ? "中一致性风险" : "低一致性风险";
   const Icon = isHigh ? AlertTriangle : isMedium ? Activity : CheckCircle2;
 
   return (
     <Card className="min-h-[210px]">
       <CardHeader>
-        <CardTitle>Consistency Risk</CardTitle>
+        <CardTitle>一致性风险</CardTitle>
         <Badge className={cn(isHigh && "border-danger text-danger", isMedium && "border-warning text-warning", !isHigh && !isMedium && "border-success text-success")}>
-          {level}
+          {displayLevel}
         </Badge>
       </CardHeader>
       <div className="flex items-center gap-4">
@@ -27,12 +28,12 @@ export function RiskSummary({ result }: { result?: AnalysisResult | null }) {
         </div>
         <div>
           <div className="text-3xl font-semibold">{result ? result.historicalDeviation.toFixed(2) : "—"}</div>
-          <p className="mt-1 text-sm text-muted">Historical deviation index</p>
+          <p className="mt-1 text-sm text-muted">历史偏离指数</p>
         </div>
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
-        <Metric label="Stylometric shift" value={result?.stylometricShift} />
-        <Metric label="Semantic drift" value={result?.semanticDrift} />
+        <Metric label="风格计量偏移" value={result?.stylometricShift} />
+        <Metric label="语义漂移" value={result?.semanticDrift} />
       </div>
     </Card>
   );
@@ -46,4 +47,3 @@ function Metric({ label, value }: { label: string; value?: number }) {
     </div>
   );
 }
-

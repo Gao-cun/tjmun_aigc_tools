@@ -10,6 +10,7 @@
 - Embedding baseline：默认 `sentence-transformers/all-MiniLM-L6-v2`，可切 OpenAI Embeddings
 - 风险输出：`Low / Medium / High Consistency Risk`
 - 可视化：dashboard、timeline、radar chart、feature drift、embedding cluster
+- 前端可配置 embedding provider、模型名和 OpenAI API key（只随本次请求发送，不写入数据库）
 - Revision history 分析接口：粘贴、大段输入、停顿、删除重写比例
 - FastAPI Swagger：`http://localhost:8000/docs`
 
@@ -73,6 +74,8 @@ macOS 一键脚本默认使用 `EMBEDDING_PROVIDER=hash` 启动 demo，避免首
 ```bash
 EMBEDDING_PROVIDER=local ./start-mac.command
 ```
+
+前端页面里的“Embedding 调用设置”会随上传历史样本和分析新文本一起发送到后端。历史样本和新文本应使用同一类 provider/model；如果向量维度不一致，后端会拒绝分析，避免产生不可比结果。
 
 ## Demo 数据
 

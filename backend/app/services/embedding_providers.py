@@ -50,23 +50,33 @@ class SentenceTransformerProvider(EmbeddingProvider):
 
 
 class OpenAIEmbeddingProvider(EmbeddingProvider):
-    def __init__(self, settings: Settings):
-        if not settings.openai_api_key:
+    def __init__(self, api_key: str | None, model: str):
+        if not api_key:
             raise ValueError("OPENAI_API_KEY is required when EMBEDDING_PROVIDER=openai")
         from openai import OpenAI
 
-        self.client = OpenAI(api_key=settings.openai_api_key)
-        self.model = settings.openai_embedding_model
+        self.client = OpenAI(api_key=api_key)
+        self.model = model
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
         response = self.client.embeddings.create(model=self.model, input=texts)
         return np.asarray([item.embedding for item in response.data], dtype=float)
 
 
-def get_embedding_provider(settings: Settings | None = None) -> EmbeddingProvider:
+def get_embedding_provider(settings: Settings | None = None, overrides: dict | None = None) -> EmbeddingProvider:
+    """按环境变量或本次请求参数选择 embedding provider。
+
+    overrides 只用于本次调用，不写入数据库或配置文件，避免前端传入的 API key 落盘。
+    """
     settings = settings or get_settings()
-    if settings.embedding_provider.lower() == "hash":
+    overrides = overrides or {}
+    provider_name = str(overrides.get("embedding_provider") or settings.embedding_provider).lower()
+    local_model = str(overrides.get("local_embedding_model") or settings.local_embedding_model)
+    openai_model = str(overrides.get("openai_embedding_model") or settings.openai_embedding_model)
+    openai_api_key = overrides.get("openai_api_key") or settings.openai_api_key
+
+    if provider_name == "hash":
         return HashEmbeddingProvider()
-    if settings.embedding_provider.lower() == "openai":
-        return OpenAIEmbeddingProvider(settings)
-    return SentenceTransformerProvider(settings.local_embedding_model)
+    if provider_name == "openai":
+        return OpenAIEmbeddingProvider(openai_api_key, openai_model)
+    return SentenceTransformerProvider(local_model)

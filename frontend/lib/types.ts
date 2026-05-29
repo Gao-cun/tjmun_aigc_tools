@@ -60,3 +60,9 @@ export type AnalyzeResponse = {
   result: AnalysisResult;
 };
 
+export type EmbeddingSettings = {
+  embeddingProvider: "hash" | "local" | "openai";
+  localEmbeddingModel: string;
+  openaiEmbeddingModel: string;
+  openaiApiKey: string;
+};
