@@ -7,7 +7,7 @@
 - Delegate profile 创建与历史文档管理
 - 支持上传 `txt` / `docx` / `pdf`
 - Stylometry 特征：句长、长句比例、功能词、标点、被动语态、连接词、POS 分布、lexical diversity
-- Embedding baseline：默认 `sentence-transformers/all-MiniLM-L6-v2`，可切 OpenAI Embeddings
+- Embedding baseline：默认 `sentence-transformers/all-MiniLM-L6-v2`，可切 OpenAI 或 OpenAI 兼容格式 Embeddings
 - 风险输出：`Low / Medium / High Consistency Risk`
 - 可视化：dashboard、timeline、radar chart、feature drift、embedding cluster
 - 前端可配置 embedding provider、模型名和 OpenAI API key（只随本次请求发送，不写入数据库）
@@ -56,6 +56,7 @@ UPLOAD_DIR=./data/uploads
 EMBEDDING_PROVIDER=local
 LOCAL_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 OPENAI_API_KEY=
+OPENAI_BASE_URL=
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
 ```
@@ -67,6 +68,15 @@ EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=your_key_from_env
 ```
 
+使用 OpenAI 兼容格式的第三方平台时，额外设置 `OPENAI_BASE_URL`，通常需要带 `/v1`：
+
+```bash
+EMBEDDING_PROVIDER=openai
+OPENAI_BASE_URL=https://your-compatible-provider.example/v1
+OPENAI_API_KEY=your_provider_key
+OPENAI_EMBEDDING_MODEL=your-embedding-model
+```
+
 不要把密钥写入代码或提交到 Git。
 
 macOS 一键脚本默认使用 `EMBEDDING_PROVIDER=hash` 启动 demo，避免首次运行下载 HuggingFace 模型导致界面卡住。需要真实本地 MiniLM embedding 时，用下面命令启动：
@@ -75,7 +85,7 @@ macOS 一键脚本默认使用 `EMBEDDING_PROVIDER=hash` 启动 demo，避免首
 EMBEDDING_PROVIDER=local ./start-mac.command
 ```
 
-前端页面里的“Embedding 调用设置”会随上传历史样本和分析新文本一起发送到后端。历史样本和新文本应使用同一类 provider/model；如果向量维度不一致，后端会拒绝分析，避免产生不可比结果。
+前端页面里的“Embedding 调用设置”会随上传历史样本和分析新文本一起发送到后端。选择 OpenAI 兼容接口时，可以填写 Base URL、模型名和 API Key；API Key 只随本次请求发送，不写入数据库。历史样本和新文本应使用同一类 provider/model/base URL；如果向量维度不一致，后端会拒绝分析，避免产生不可比结果。
 
 ## Demo 数据
 

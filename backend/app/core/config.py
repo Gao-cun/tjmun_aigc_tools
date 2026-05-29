@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     embedding_provider: str = "local"
     local_embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     openai_api_key: str | None = None
+    openai_base_url: str | None = None
     openai_embedding_model: str = "text-embedding-3-small"
     cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
@@ -25,4 +26,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

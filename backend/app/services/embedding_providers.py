@@ -50,12 +50,12 @@ class SentenceTransformerProvider(EmbeddingProvider):
 
 
 class OpenAIEmbeddingProvider(EmbeddingProvider):
-    def __init__(self, api_key: str | None, model: str):
+    def __init__(self, api_key: str | None, model: str, base_url: str | None = None):
         if not api_key:
-            raise ValueError("OPENAI_API_KEY is required when EMBEDDING_PROVIDER=openai")
+            raise ValueError("使用 OpenAI 兼容 Embedding 接口时必须提供 API Key。")
         from openai import OpenAI
 
-        self.client = OpenAI(api_key=api_key)
+        self.client = OpenAI(api_key=api_key, base_url=base_url or None)
         self.model = model
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
@@ -64,10 +64,10 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         except Exception as exc:
             message = str(exc)
             if "insufficient_quota" in message or "exceeded your current quota" in message:
-                raise ValueError("OpenAI Embedding 调用失败：当前 API key 额度不足或账单不可用。请更换可用 key，或在前端切换为 Hash 本地快速模式 / HuggingFace 本地模型。") from exc
+                raise ValueError("OpenAI 兼容 Embedding 调用失败：当前 API key 额度不足或账单不可用。请更换可用 key，或在前端切换为 Hash 本地快速模式 / HuggingFace 本地模型。") from exc
             if "invalid_api_key" in message or "Incorrect API key" in message:
-                raise ValueError("OpenAI Embedding 调用失败：API key 无效。请检查前端填写的 key。") from exc
-            raise ValueError(f"OpenAI Embedding 调用失败：{message}") from exc
+                raise ValueError("OpenAI 兼容 Embedding 调用失败：API key 无效。请检查前端填写的 key。") from exc
+            raise ValueError(f"OpenAI 兼容 Embedding 调用失败：{message}") from exc
         return np.asarray([item.embedding for item in response.data], dtype=float)
 
 
@@ -82,9 +82,10 @@ def get_embedding_provider(settings: Settings | None = None, overrides: dict | N
     local_model = str(overrides.get("local_embedding_model") or settings.local_embedding_model)
     openai_model = str(overrides.get("openai_embedding_model") or settings.openai_embedding_model)
     openai_api_key = overrides.get("openai_api_key") or settings.openai_api_key
+    openai_base_url = overrides.get("openai_base_url") or settings.openai_base_url
 
     if provider_name == "hash":
         return HashEmbeddingProvider()
     if provider_name == "openai":
-        return OpenAIEmbeddingProvider(openai_api_key, openai_model)
+        return OpenAIEmbeddingProvider(openai_api_key, openai_model, str(openai_base_url).strip() if openai_base_url else None)
     return SentenceTransformerProvider(local_model)

@@ -28,6 +28,7 @@ export function DashboardShell({ initialDelegateId }: { initialDelegateId?: stri
   const [embeddingSettings, setEmbeddingSettings] = useState<EmbeddingSettings>({
     embeddingProvider: "hash",
     localEmbeddingModel: "sentence-transformers/all-MiniLM-L6-v2",
+    openaiBaseUrl: "",
     openaiEmbeddingModel: "text-embedding-3-small",
     openaiApiKey: ""
   });
@@ -216,7 +217,7 @@ function EmbeddingSettingsPanel({ settings, onChange }: { settings: EmbeddingSet
           <select className="w-full rounded-md border border-border bg-panelSoft px-3 py-2 text-sm text-foreground outline-none focus:border-accent" value={settings.embeddingProvider} onChange={(event) => update({ embeddingProvider: event.target.value as EmbeddingSettings["embeddingProvider"] })}>
             <option value="hash">Hash 本地快速模式</option>
             <option value="local">HuggingFace 本地模型</option>
-            <option value="openai">OpenAI Embedding API</option>
+            <option value="openai">OpenAI 兼容 Embedding API</option>
           </select>
         </label>
         <label className="space-y-1 text-xs text-muted lg:col-span-2">
@@ -224,15 +225,19 @@ function EmbeddingSettingsPanel({ settings, onChange }: { settings: EmbeddingSet
           <input className="w-full rounded-md border border-border bg-panelSoft px-3 py-2 text-sm text-foreground outline-none focus:border-accent" value={settings.localEmbeddingModel} onChange={(event) => update({ localEmbeddingModel: event.target.value })} />
         </label>
         <label className="space-y-1 text-xs text-muted">
-          OpenAI 模型
+          OpenAI 兼容模型
           <input className="w-full rounded-md border border-border bg-panelSoft px-3 py-2 text-sm text-foreground outline-none focus:border-accent" value={settings.openaiEmbeddingModel} onChange={(event) => update({ openaiEmbeddingModel: event.target.value })} />
         </label>
         <label className="space-y-1 text-xs text-muted lg:col-span-2">
-          OpenAI API Key（仅本次浏览器会话使用，不保存）
+          OpenAI 兼容接口地址 Base URL（留空则使用官方接口）
+          <input className="w-full rounded-md border border-border bg-panelSoft px-3 py-2 text-sm text-foreground outline-none focus:border-accent" value={settings.openaiBaseUrl} onChange={(event) => update({ openaiBaseUrl: event.target.value })} placeholder="https://api.openai.com/v1 或第三方兼容地址" />
+        </label>
+        <label className="space-y-1 text-xs text-muted lg:col-span-2">
+          API Key（仅本次浏览器会话使用，不保存）
           <input className="w-full rounded-md border border-border bg-panelSoft px-3 py-2 text-sm text-foreground outline-none focus:border-accent" type="password" value={settings.openaiApiKey} onChange={(event) => update({ openaiApiKey: event.target.value })} placeholder="sk-..." />
         </label>
-        <div className="rounded-md border border-border bg-panelSoft p-3 text-xs leading-5 text-muted lg:col-span-2">
-          上传历史样本和分析新文本必须使用同一类 provider/model；若向量维度不同，后端会拒绝分析以保护结果可信度。
+        <div className="rounded-md border border-border bg-panelSoft p-3 text-xs leading-5 text-muted lg:col-span-4">
+          兼容接口需支持 OpenAI 格式的 embeddings.create 调用，Base URL 通常形如 https://example.com/v1。上传历史样本和分析新文本必须使用同一类 provider/model；若向量维度不同，后端会拒绝分析以保护结果可信度。
         </div>
       </div>
     </Card>

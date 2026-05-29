@@ -39,7 +39,7 @@ export function UploadDropzone({ delegateId, mode, embeddingSettings, onUploaded
       return;
     }
     if (embeddingSettings.embeddingProvider === "openai" && !embeddingSettings.openaiApiKey.trim()) {
-      setStatus("使用 OpenAI Embedding API 时，请先填写 API Key。");
+      setStatus("使用 OpenAI 兼容 Embedding API 时，请先填写 API Key。");
       return;
     }
     setLoading(true);
@@ -49,6 +49,7 @@ export function UploadDropzone({ delegateId, mode, embeddingSettings, onUploaded
     form.append("file", file);
     form.append("embedding_provider", embeddingSettings.embeddingProvider);
     form.append("local_embedding_model", embeddingSettings.localEmbeddingModel);
+    form.append("openai_base_url", embeddingSettings.openaiBaseUrl);
     form.append("openai_embedding_model", embeddingSettings.openaiEmbeddingModel);
     if (embeddingSettings.openaiApiKey) {
       form.append("openai_api_key", embeddingSettings.openaiApiKey);

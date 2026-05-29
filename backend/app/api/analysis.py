@@ -19,6 +19,7 @@ async def analyze_new_document(
     delegate_id: str = Form(...),
     embedding_provider: str | None = Form(None),
     local_embedding_model: str | None = Form(None),
+    openai_base_url: str | None = Form(None),
     openai_embedding_model: str | None = Form(None),
     openai_api_key: str | None = Form(None),
     file: UploadFile = File(...),
@@ -46,6 +47,7 @@ async def analyze_new_document(
             overrides={
                 "embedding_provider": embedding_provider,
                 "local_embedding_model": local_embedding_model,
+                "openai_base_url": openai_base_url,
                 "openai_embedding_model": openai_embedding_model,
                 "openai_api_key": openai_api_key,
             }
