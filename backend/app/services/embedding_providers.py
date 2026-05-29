@@ -59,7 +59,15 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         self.model = model
 
     def embed_texts(self, texts: list[str]) -> np.ndarray:
-        response = self.client.embeddings.create(model=self.model, input=texts)
+        try:
+            response = self.client.embeddings.create(model=self.model, input=texts)
+        except Exception as exc:
+            message = str(exc)
+            if "insufficient_quota" in message or "exceeded your current quota" in message:
+                raise ValueError("OpenAI Embedding 调用失败：当前 API key 额度不足或账单不可用。请更换可用 key，或在前端切换为 Hash 本地快速模式 / HuggingFace 本地模型。") from exc
+            if "invalid_api_key" in message or "Incorrect API key" in message:
+                raise ValueError("OpenAI Embedding 调用失败：API key 无效。请检查前端填写的 key。") from exc
+            raise ValueError(f"OpenAI Embedding 调用失败：{message}") from exc
         return np.asarray([item.embedding for item in response.data], dtype=float)
 
 

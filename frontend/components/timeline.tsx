@@ -20,6 +20,7 @@ export function Timeline({ documents }: { documents: HistoryDocument[] }) {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{doc.filename}</div>
               <div className="text-xs text-muted">{doc.documentType} · {doc.meeting ?? "未填写会议"} · {doc.documentDate ?? "未填写日期"}</div>
+              {doc.errorMessage ? <div className="mt-2 line-clamp-3 text-xs leading-5 text-danger">{doc.errorMessage}</div> : null}
             </div>
             <span className={cn("rounded-md px-2 py-1 text-xs", doc.status === "ready" ? "bg-success/10 text-success" : doc.status === "failed" ? "bg-danger/10 text-danger" : "bg-warning/10 text-warning")}>
               {doc.status}

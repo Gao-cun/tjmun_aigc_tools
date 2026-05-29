@@ -38,6 +38,10 @@ export function UploadDropzone({ delegateId, mode, embeddingSettings, onUploaded
       setStatus("请先选择代表和文件。");
       return;
     }
+    if (embeddingSettings.embeddingProvider === "openai" && !embeddingSettings.openaiApiKey.trim()) {
+      setStatus("使用 OpenAI Embedding API 时，请先填写 API Key。");
+      return;
+    }
     setLoading(true);
     setStatus("");
     const form = new FormData();
